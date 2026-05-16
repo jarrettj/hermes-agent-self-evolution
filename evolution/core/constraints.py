@@ -15,6 +15,7 @@ from evolution.core.config import EvolutionConfig
 @dataclass
 class ConstraintResult:
     """Result of constraint validation."""
+
     passed: bool
     constraint_name: str
     message: str
@@ -41,7 +42,9 @@ class ConstraintValidator:
 
         # 2. Growth limit (if baseline provided)
         if baseline_text:
-            results.append(self._check_growth(artifact_text, baseline_text, artifact_type))
+            results.append(
+                self._check_growth(artifact_text, baseline_text, artifact_type)
+            )
 
         # 3. Non-empty
         results.append(self._check_non_empty(artifact_text))
@@ -68,11 +71,15 @@ class ConstraintValidator:
                     passed=True,
                     constraint_name="test_suite",
                     message="All tests passed",
-                    details=result.stdout.strip().split("\n")[-1] if result.stdout else "",
+                    details=result.stdout.strip().split("\n")[-1]
+                    if result.stdout
+                    else "",
                 )
             else:
                 # Extract failure summary
-                last_lines = result.stdout.strip().split("\n")[-5:] if result.stdout else []
+                last_lines = (
+                    result.stdout.strip().split("\n")[-5:] if result.stdout else []
+                )
                 return ConstraintResult(
                     passed=False,
                     constraint_name="test_suite",
@@ -116,7 +123,9 @@ class ConstraintValidator:
                 message=f"Size exceeded: {size}/{limit} chars ({size - limit} over)",
             )
 
-    def _check_growth(self, text: str, baseline: str, artifact_type: str) -> ConstraintResult:
+    def _check_growth(
+        self, text: str, baseline: str, artifact_type: str
+    ) -> ConstraintResult:
         growth = (len(text) - len(baseline)) / max(1, len(baseline))
         max_growth = self.config.max_prompt_growth
 

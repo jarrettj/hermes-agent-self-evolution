@@ -88,7 +88,9 @@ class TestSkillStructure:
 
 class TestValidateAll:
     def test_valid_skill_passes_all(self, validator):
-        skill = "---\nname: test\ndescription: Test skill\n---\n\n# Procedure\n1. Do thing"
+        skill = (
+            "---\nname: test\ndescription: Test skill\n---\n\n# Procedure\n1. Do thing"
+        )
         results = validator.validate_all(skill, "skill")
         assert all(r.passed for r in results)
 
