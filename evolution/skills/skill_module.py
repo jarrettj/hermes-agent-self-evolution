@@ -96,9 +96,14 @@ class SkillModule(dspy.Module):
         You are an AI agent following specific skill instructions to complete a task.
         Read the skill instructions carefully and follow the procedure described.
         """
-        skill_instructions: str = dspy.InputField(desc="The skill instructions to follow")
+
+        skill_instructions: str = dspy.InputField(
+            desc="The skill instructions to follow"
+        )
         task_input: str = dspy.InputField(desc="The task to complete")
-        output: str = dspy.OutputField(desc="Your response following the skill instructions")
+        output: str = dspy.OutputField(
+            desc="Your response following the skill instructions"
+        )
 
     def __init__(self, skill_text: str):
         super().__init__()

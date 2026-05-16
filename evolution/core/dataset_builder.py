@@ -20,6 +20,7 @@ from evolution.core.config import EvolutionConfig
 @dataclass
 class EvalExample:
     """A single evaluation example."""
+
     task_input: str  # What the user asks
     expected_behavior: str  # Rubric — what a good response looks like
     difficulty: str = "medium"  # easy, medium, hard
@@ -43,6 +44,7 @@ class EvalExample:
 @dataclass
 class EvalDataset:
     """Train/val/holdout split of evaluation examples."""
+
     train: list[EvalExample] = field(default_factory=list)
     val: list[EvalExample] = field(default_factory=list)
     holdout: list[EvalExample] = field(default_factory=list)
@@ -54,7 +56,11 @@ class EvalDataset:
     def save(self, path: Path):
         """Save dataset splits to JSONL files."""
         path.mkdir(parents=True, exist_ok=True)
-        for split_name, split_data in [("train", self.train), ("val", self.val), ("holdout", self.holdout)]:
+        for split_name, split_data in [
+            ("train", self.train),
+            ("val", self.val),
+            ("holdout", self.holdout),
+        ]:
             with open(path / f"{split_name}.jsonl", "w") as f:
                 for ex in split_data:
                     f.write(json.dumps(ex.to_dict()) + "\n")
@@ -103,10 +109,17 @@ class SyntheticDatasetBuilder:
         - A difficulty level (easy, medium, hard)
         - A category (what aspect of the skill this tests)
         """
-        artifact_text: str = dspy.InputField(desc="The full text of the skill/tool/prompt being tested")
-        artifact_type: str = dspy.InputField(desc="Type: 'skill', 'tool_description', or 'prompt_section'")
+
+        artifact_text: str = dspy.InputField(
+            desc="The full text of the skill/tool/prompt being tested"
+        )
+        artifact_type: str = dspy.InputField(
+            desc="Type: 'skill', 'tool_description', or 'prompt_section'"
+        )
         num_cases: int = dspy.InputField(desc="Number of test cases to generate")
-        test_cases: str = dspy.OutputField(desc="JSON array of test cases, each with: task_input, expected_behavior, difficulty, category")
+        test_cases: str = dspy.OutputField(
+            desc="JSON array of test cases, each with: task_input, expected_behavior, difficulty, category"
+        )
 
     def __init__(self, config: EvolutionConfig):
         self.config = config
@@ -138,11 +151,14 @@ class SyntheticDatasetBuilder:
         except json.JSONDecodeError:
             # Try to extract JSON from the response
             import re
-            match = re.search(r'\[.*\]', result.test_cases, re.DOTALL)
+
+            match = re.search(r"\[.*\]", result.test_cases, re.DOTALL)
             if match:
                 cases_raw = json.loads(match.group())
             else:
-                raise ValueError(f"Could not parse test cases from LLM output: {result.test_cases[:200]}")
+                raise ValueError(
+                    f"Could not parse test cases from LLM output: {result.test_cases[:200]}"
+                )
 
         examples = [
             EvalExample(
@@ -164,8 +180,8 @@ class SyntheticDatasetBuilder:
 
         return EvalDataset(
             train=examples[:n_train],
-            val=examples[n_train:n_train + n_val],
-            holdout=examples[n_train + n_val:],
+            val=examples[n_train : n_train + n_val],
+            holdout=examples[n_train + n_val :],
         )
 
 
@@ -196,6 +212,6 @@ class GoldenDatasetLoader:
 
         return EvalDataset(
             train=examples[:n_train],
-            val=examples[n_train:n_train + n_val],
-            holdout=examples[n_train + n_val:],
+            val=examples[n_train : n_train + n_val],
+            holdout=examples[n_train + n_val :],
         )

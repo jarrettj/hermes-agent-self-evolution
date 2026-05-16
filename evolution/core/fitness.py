@@ -14,6 +14,7 @@ from evolution.core.config import EvolutionConfig
 @dataclass
 class FitnessScore:
     """Multi-dimensional fitness score."""
+
     correctness: float = 0.0  # Did the agent produce correct output? (0-1)
     procedure_following: float = 0.0  # Did it follow the skill's procedure? (0-1)
     conciseness: float = 0.0  # Was it appropriately concise? (0-1)
@@ -48,14 +49,27 @@ class LLMJudge:
 
         Also provide specific, actionable feedback on what could be improved.
         """
+
         task_input: str = dspy.InputField(desc="The task the agent was given")
-        expected_behavior: str = dspy.InputField(desc="Rubric describing what a good response looks like")
+        expected_behavior: str = dspy.InputField(
+            desc="Rubric describing what a good response looks like"
+        )
         agent_output: str = dspy.InputField(desc="The agent's actual response")
-        skill_text: str = dspy.InputField(desc="The skill/instructions the agent was following")
-        correctness: float = dspy.OutputField(desc="Score 0.0-1.0: Did the response correctly address the task?")
-        procedure_following: float = dspy.OutputField(desc="Score 0.0-1.0: Did it follow the expected procedure?")
-        conciseness: float = dspy.OutputField(desc="Score 0.0-1.0: Appropriately concise?")
-        feedback: str = dspy.OutputField(desc="Specific, actionable feedback on what could be improved")
+        skill_text: str = dspy.InputField(
+            desc="The skill/instructions the agent was following"
+        )
+        correctness: float = dspy.OutputField(
+            desc="Score 0.0-1.0: Did the response correctly address the task?"
+        )
+        procedure_following: float = dspy.OutputField(
+            desc="Score 0.0-1.0: Did it follow the expected procedure?"
+        )
+        conciseness: float = dspy.OutputField(
+            desc="Score 0.0-1.0: Appropriately concise?"
+        )
+        feedback: str = dspy.OutputField(
+            desc="Specific, actionable feedback on what could be improved"
+        )
 
     def __init__(self, config: EvolutionConfig):
         self.config = config
@@ -104,7 +118,9 @@ class LLMJudge:
         )
 
 
-def skill_fitness_metric(example: dspy.Example, prediction: dspy.Prediction, trace=None) -> float:
+def skill_fitness_metric(
+    example: dspy.Example, prediction: dspy.Prediction, trace=None
+) -> float:
     """DSPy-compatible metric function for skill optimization.
 
     This is what gets passed to dspy.GEPA(metric=...).
