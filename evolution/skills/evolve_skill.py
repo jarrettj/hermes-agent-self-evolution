@@ -15,13 +15,12 @@ from typing import Optional
 import click
 import dspy
 from rich.console import Console
-from rich.panel import Panel
 from rich.table import Table
 
-from evolution.core.config import EvolutionConfig, get_hermes_agent_path
+from evolution.core.config import EvolutionConfig
 from evolution.core.dataset_builder import SyntheticDatasetBuilder, EvalDataset, GoldenDatasetLoader
 from evolution.core.external_importers import build_dataset_from_external
-from evolution.core.fitness import skill_fitness_metric, LLMJudge, FitnessScore
+from evolution.core.fitness import skill_fitness_metric
 from evolution.core.constraints import ConstraintValidator
 from evolution.skills.skill_module import (
     SkillModule,
@@ -71,10 +70,10 @@ def evolve(
     console.print(f"  Description: {skill['description'][:80]}...")
 
     if dry_run:
-        console.print(f"\n[bold green]DRY RUN — setup validated successfully.[/bold green]")
+        console.print("\n[bold green]DRY RUN — setup validated successfully.[/bold green]")
         console.print(f"  Would generate eval dataset (source: {eval_source})")
         console.print(f"  Would run GEPA optimization ({iterations} iterations)")
-        console.print(f"  Would validate constraints and create PR")
+        console.print("  Would validate constraints and create PR")
         return
 
     # ── 2. Build or load evaluation dataset ─────────────────────────────
@@ -117,7 +116,7 @@ def evolve(
     console.print(f"  Split: {len(dataset.train)} train / {len(dataset.val)} val / {len(dataset.holdout)} holdout")
 
     # ── 3. Validate constraints on baseline ─────────────────────────────
-    console.print(f"\n[bold]Validating baseline constraints[/bold]")
+    console.print("\n[bold]Validating baseline constraints[/bold]")
     validator = ConstraintValidator(config)
     baseline_constraints = validator.validate_all(skill["body"], "skill")
     all_pass = True
@@ -132,7 +131,7 @@ def evolve(
         console.print("[yellow]⚠ Baseline skill has constraint violations — proceeding anyway[/yellow]")
 
     # ── 4. Set up DSPy + GEPA optimizer ─────────────────────────────────
-    console.print(f"\n[bold]Configuring optimizer[/bold]")
+    console.print("\n[bold]Configuring optimizer[/bold]")
     console.print(f"  Optimizer: GEPA ({iterations} iterations)")
     console.print(f"  Optimizer model: {optimizer_model}")
     console.print(f"  Eval model: {eval_model}")
@@ -185,7 +184,7 @@ def evolve(
     evolved_full = reassemble_skill(skill["frontmatter"], evolved_body)
 
     # ── 7. Validate evolved skill ───────────────────────────────────────
-    console.print(f"\n[bold]Validating evolved skill[/bold]")
+    console.print("\n[bold]Validating evolved skill[/bold]")
     evolved_constraints = validator.validate_all(evolved_body, "skill", baseline_text=skill["body"])
     all_pass = True
     for c in evolved_constraints:

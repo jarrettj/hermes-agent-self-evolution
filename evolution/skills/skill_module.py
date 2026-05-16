@@ -5,7 +5,6 @@ where the skill text is the optimizable parameter. GEPA can then
 mutate the skill text and evaluate the results.
 """
 
-import re
 from pathlib import Path
 from typing import Optional
 
